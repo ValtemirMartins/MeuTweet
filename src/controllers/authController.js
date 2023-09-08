@@ -163,7 +163,7 @@ router.post('/criar-tweet', async (req, res) => {
 router.get('/tweets', async (req, res) => {
   const usuarioLogado = req.userId;
   const pagina = req.query.pagina || 1;
-  const limitePorPagina = 10;
+  const limitePorPagina = 30;
   const tipoTweets = req.query.tipo || 'todos'; 
 
   try {
