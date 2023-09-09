@@ -15,7 +15,7 @@ function generateToken(params = {}) {
 
 }
 
-router.post('/cadastro', async (req, res) => {
+router.post('/usuarios/registro', async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -45,7 +45,7 @@ router.post('/cadastro', async (req, res) => {
   }
 });
 
-router.post('/autenticar', async (req, res) => {
+router.post('/usuarios/autenticar', async (req, res) => {
   const { username, password } = req.body;
 
   const user = await User.findOne({ username }).select('+password');
@@ -66,7 +66,7 @@ router.post('/autenticar', async (req, res) => {
   });
 });
 
-router.post('/seguir', async (req, res) => {
+router.post('/usuarios/seguir', async (req, res) => {
   const { username } = req.body;
   const usuarioLogado = req.userId;
 
@@ -106,7 +106,7 @@ router.post('/seguir', async (req, res) => {
     res.status(500).json({ error: 'Ocorreu um erro ao processar a solicitação' });
   }
 });
-router.post('/deixar-de-seguir', async (req, res) => {
+router.post('/usuarios/deixar-de-seguir', async (req, res) => {
 
   try {
     const { username } = req.body;
@@ -135,7 +135,7 @@ router.post('/deixar-de-seguir', async (req, res) => {
   }
 });
 
-router.post('/criar-tweet', async (req, res) => {
+router.post('/tweets/criar', async (req, res) => {
   const { conteudo } = req.body;
   const usuarioLogado = req.userId;
 
@@ -157,10 +157,10 @@ router.post('/criar-tweet', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ocorreu um erro ao processar a solicitação' });
+    res.status(500).json({ error: 'Ocorreu um erro ao criar seu tweet' });
   }
 });
-router.get('/tweets', async (req, res) => {
+router.get('/tweets/listar', async (req, res) => {
   const usuarioLogado = req.userId;
   const pagina = req.query.pagina || 1;
   const limitePorPagina = 30;
@@ -205,7 +205,7 @@ router.get('/tweets', async (req, res) => {
   }
 });
 
-router.get('/usuarios', async (req, res) => {
+router.get('/usuarios/buscar', async (req, res) => {
   const { nome } = req.query;
 
   try {
