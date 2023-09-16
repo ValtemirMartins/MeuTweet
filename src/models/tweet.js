@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
 
 const tweetSchema = new mongoose.Schema({
-  autor: {
+  author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', // Referência ao modelo de dados User para associar o autor ao usuário
     required: true,
   },
-  conteudo: {
+  content: {
     type: String,
     required: true,
     maxlength: 280, // Defina o limite máximo de caracteres para o conteúdo do tweet
