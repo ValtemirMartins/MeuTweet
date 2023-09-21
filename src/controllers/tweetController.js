@@ -31,31 +31,8 @@ router.post('/tweets', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while creating your tweet' });
   }
 });
-// Rota para obter todos os tweets do usuário logado com paginação
+
 router.get('/tweets', authMiddleware, async (req, res) => {
-  const loggedInUserId = req.userId;
-  const page = parseInt(req.query.page) || 1; // Página padrão é 1
-  const perPage = 10; 
-
-  try {
-    const totalTweets = await Tweet.countDocuments({ author: loggedInUserId });
-    const totalPages = Math.ceil(totalTweets / perPage);
-
-    const tweets = await Tweet.find({ author: loggedInUserId })
-      .sort({ createdAt: -1 })
-      .skip((page - 1) * perPage)
-      .limit(perPage)
-      .exec();
-
-    res.status(200).json({ tweets, totalPages });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while fetching your tweets' });
-  }
-});
-
-// Listar tweets
-router.get('/tweets/list', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
   const page = req.query.page || 1;
   const itemsPerPage = 30;

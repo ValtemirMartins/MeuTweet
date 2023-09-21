@@ -47,8 +47,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-
-
 // Autenticar um usuário
 router.post('/authenticate', async (req, res) => {
   const { username, password } = req.body;
