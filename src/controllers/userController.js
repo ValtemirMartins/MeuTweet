@@ -75,7 +75,6 @@ router.delete('/unfollow', authMiddleware, async (req, res) => {
   }
 });
 
-
 router.get('/users', authMiddleware, async (req, res) => {
   const { name } = req.query;
 
@@ -97,7 +96,7 @@ router.get('/users', authMiddleware, async (req, res) => {
   }
 });
 // Deletar o perfil do usuário logado
-router.delete('/delete', authMiddleware, async (req, res) => {
+router.delete('/users', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
 
   try {
@@ -122,7 +121,7 @@ router.delete('/delete', authMiddleware, async (req, res) => {
   }
 });
 // Atualizar o perfil do usuário logado
-router.put('/update', authMiddleware, async (req, res) => {
+router.put('/users', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
   const { username, password, name, surname } = req.body;
 
@@ -165,7 +164,7 @@ router.put('/update', authMiddleware, async (req, res) => {
   }
 });
 //Buscar informações do perfil do usuário logado
-router.get('/profile', authMiddleware, async (req, res) => {
+router.get('/users/:userId', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
 
   try {
