@@ -14,10 +14,10 @@ function generateToken(params = {}) {
     expiresIn: 86400,
   });
 }
-// Registrar um usuário
+
 router.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, name, surname } = req.body;
 
     const existingUser = await User.findOne({ username });
 
@@ -29,7 +29,12 @@ router.post('/register', async (req, res) => {
       return res.status(400).send({ error: 'Password must be at least 8 characters long' });
     }
 
-    const user = await User.create({ username, password });
+    const user = await User.create({
+      username,
+      password,
+      name, 
+      surname, 
+    });
 
     user.password = undefined;
 
@@ -41,6 +46,8 @@ router.post('/register', async (req, res) => {
     return res.status(400).send({ error: 'Failed to register user' });
   }
 });
+
+
 
 // Autenticar um usuário
 router.post('/authenticate', async (req, res) => {
