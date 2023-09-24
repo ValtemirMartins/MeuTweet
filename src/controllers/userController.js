@@ -75,7 +75,7 @@ router.delete('/unfollow', authMiddleware, async (req, res) => {
   }
 });
 
-router.get('/users', authMiddleware, async (req, res) => {
+router.get('/users', async (req, res) => {
   const { name } = req.query;
 
   try {
@@ -163,7 +163,6 @@ router.put('/users', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the profile' });
   }
 });
-//Buscar informações do perfil do usuário logado
 router.get('/users/:userId', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
 
@@ -196,30 +195,28 @@ router.get('/users/:userId', authMiddleware, async (req, res) => {
   }
 });
 
-// buscar informações do perfil de outro usuário
+// Rota para buscar informações do perfil de outro usuário
 router.get('/user/:username', authMiddleware, async (req, res) => {
   const { username } = req.params;
 
   try {
-    
     const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Busque o número de seguidores do usuário
-    const followersCount = await Follow.countDocuments({ following: user._id });
+    // Busque os usuários que o usuário segue
+    const followingUsers = await Follow.find({ follower: user._id }).populate('following', 'name surname');
 
-    // Busque o número de pessoas que o usuário segue
-    const followingCount = await Follow.countDocuments({ follower: user._id });
-
-    // Crie um objeto de resposta com as informações do perfil do usuário
+    // Crie um objeto de resposta com as informações do perfil do usuário e os detalhes dos usuários que ele segue
     const userProfile = {
       name: user.name,
       surname: user.surname,
-      followers: followersCount,
-      following: followingCount,
+      following: followingUsers.map(follow => ({
+        name: follow.following.name,
+        surname: follow.following.surname,
+      })),
     };
 
     res.status(200).json(userProfile);

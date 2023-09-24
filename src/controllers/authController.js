@@ -3,10 +3,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth.json');
 const User = require('../models/user');
-const authMiddleware = require('../middleware/auth');
+//const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
-router.use(authMiddleware);
+//router.use(authMiddleware);
 
 
 function generateToken(params = {}) {
