@@ -121,7 +121,7 @@ router.delete('/users', authMiddleware, async (req, res) => {
   }
 });
 // Atualizar o perfil do usuário logado
-router.put('/users', authMiddleware, async (req, res) => {
+router.patch('/users', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
   const { username, password, name, surname } = req.body;
 
@@ -165,6 +165,7 @@ router.put('/users', authMiddleware, async (req, res) => {
 });
 router.get('/users/:userId', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
+  const requestedUserId = req.params.userId;
 
   try {
     // Busque as informações do usuário logado
@@ -174,18 +175,30 @@ router.get('/users/:userId', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Logged-in user not found' });
     }
 
+    // Busque o usuário solicitado
+    const requestedUser = await User.findById(requestedUserId);
+
+    if (!requestedUser) {
+      return res.status(404).json({ error: 'Requested user not found' });
+    }
+
     // Busque o número de seguidores do usuário logado
-    const followersCount = await Follow.countDocuments({ following: loggedInUserId });
+    const followers = await Follow.find({ following: loggedInUserId }).populate('follower', 'name surname');
 
     // Busque o número de pessoas que o usuário logado segue
-    const followingCount = await Follow.countDocuments({ follower: loggedInUserId });
+    const following = await Follow.find({ follower: loggedInUserId }).populate('following', 'name surname');
 
     // Crie um objeto de resposta com as informações do perfil
     const userProfile = {
-      name: loggedInUser.name,
-      surname: loggedInUser.surname,
-      followers: followersCount,
-      following: followingCount,
+      name: requestedUser.name,
+      surname: requestedUser.surname,
+      followers: followers.map(follower => ({
+        name: follower.follower.name,
+        surname: follower.follower.surname,
+      })),
+      following: following.map(user => ({ 
+        name: user.following.name, 
+        surname: user.following.surname })),
     };
 
     res.status(200).json(userProfile);
