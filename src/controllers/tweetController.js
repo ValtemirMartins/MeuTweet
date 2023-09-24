@@ -46,7 +46,7 @@ router.get('/tweets', authMiddleware, async (req, res) => {
         .sort({ createdAt: -1 })
         .skip((page - 1) * itemsPerPage)
         .limit(itemsPerPage);
-        
+
     } else if (tweetType === 'following') {
       const followedUsers = await Follow.find({ follower: loggedInUserId }).select('following');
       const followedUserIds = followedUsers.map(user => user.following);
@@ -119,6 +119,10 @@ router.put('/tweets/:tweetId', authMiddleware, async (req, res) => {
 
     if (timeDifferenceMinutes > 10) {
       return res.status(403).json({ error: 'You can only update tweets within 10 minutes of creation' });
+    }
+    // Verifique se o conteúdo foi fornecido
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required to update the tweet' });
     }
 
     // Atualize o conteúdo do tweet
