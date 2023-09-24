@@ -163,67 +163,24 @@ router.patch('/users', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the profile' });
   }
 });
-router.get('/users/:userId', authMiddleware, async (req, res) => {
-  const loggedInUserId = req.userId;
-  const requestedUserId = req.params.userId;
+
+// Rota para buscar informações do perfil do proprio usuario e de outro usuário
+router.get('/user/:userId', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
 
   try {
-    // Busque as informações do usuário logado
-    const loggedInUser = await User.findById(loggedInUserId);
-
-    if (!loggedInUser) {
-      return res.status(404).json({ error: 'Logged-in user not found' });
-    }
-
-    // Busque o usuário solicitado
-    const requestedUser = await User.findById(requestedUserId);
-
-    if (!requestedUser) {
-      return res.status(404).json({ error: 'Requested user not found' });
-    }
-
-    // Busque o número de seguidores do usuário logado
-    const followers = await Follow.find({ following: loggedInUserId }).populate('follower', 'name surname');
-
-    // Busque o número de pessoas que o usuário logado segue
-    const following = await Follow.find({ follower: loggedInUserId }).populate('following', 'name surname');
-
-    // Crie um objeto de resposta com as informações do perfil
-    const userProfile = {
-      name: requestedUser.name,
-      surname: requestedUser.surname,
-      followers: followers.map(follower => ({
-        name: follower.follower.name,
-        surname: follower.follower.surname,
-      })),
-      following: following.map(user => ({ 
-        name: user.following.name, 
-        surname: user.following.surname })),
-    };
-
-    res.status(200).json(userProfile);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while fetching user profile' });
-  }
-});
-
-// Rota para buscar informações do perfil de outro usuário
-router.get('/user/:username', authMiddleware, async (req, res) => {
-  const { username } = req.params;
-
-  try {
-    const user = await User.findOne({ username });
+    // Busque as informações do usuário pelo ID
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     // Busque os usuários que o usuário segue
-    const followingUsers = await Follow.find({ follower: user._id }).populate('following', 'name surname');
+    const followingUsers = await Follow.find({ follower: userId }).populate('following', 'name surname');
 
     // Busque os seguidores do usuário
-    const followers = await Follow.find({ following: user._id }).populate('follower', 'name surname');
+    const followers = await Follow.find({ following: userId }).populate('follower', 'name surname');
 
     // Crie um objeto de resposta com as informações do perfil do usuário, os detalhes dos usuários que ele segue e os detalhes dos seguidores
     const userProfile = {
@@ -245,6 +202,7 @@ router.get('/user/:username', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching user profile' });
   }
 });
+
 
 
 
