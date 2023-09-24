@@ -222,13 +222,20 @@ router.get('/user/:username', authMiddleware, async (req, res) => {
     // Busque os usuários que o usuário segue
     const followingUsers = await Follow.find({ follower: user._id }).populate('following', 'name surname');
 
-    // Crie um objeto de resposta com as informações do perfil do usuário e os detalhes dos usuários que ele segue
+    // Busque os seguidores do usuário
+    const followers = await Follow.find({ following: user._id }).populate('follower', 'name surname');
+
+    // Crie um objeto de resposta com as informações do perfil do usuário, os detalhes dos usuários que ele segue e os detalhes dos seguidores
     const userProfile = {
       name: user.name,
       surname: user.surname,
       following: followingUsers.map(follow => ({
         name: follow.following.name,
         surname: follow.following.surname,
+      })),
+      followers: followers.map(follow => ({
+        name: follow.follower.name,
+        surname: follow.follower.surname,
       })),
     };
 
@@ -238,6 +245,7 @@ router.get('/user/:username', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'An error occurred while fetching user profile' });
   }
 });
+
 
 
 module.exports = app => app.use('/auth', router)
