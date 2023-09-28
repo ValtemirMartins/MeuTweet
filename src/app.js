@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }))
 require('./controllers/authController')(app);
 require('./controllers/userController')(app);
 require('./controllers/tweetController')(app);
-
+require('./controllers/likeController')(app);
 
 
 module.exports = app

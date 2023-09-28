@@ -30,10 +30,14 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', async function(next){
   const hash = await bcrypt.hash(this.password, 10);
   this.password = hash;
-
   next()
-})
+});
 
-const User = mongoose.model('User', UserSchema);
+UserSchema.pre('remove', async function(next) {
+  const userId = this._id;
+  await Like.deleteMany({ user: userId });
+  next();
+});
 
-module.exports = User;
+
+module.exports = mongoose.model('User', UserSchema);

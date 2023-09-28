@@ -14,10 +14,20 @@ const tweetSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-  }
-  
+  },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  likeCount: {
+    type: Number,
+    default: 0, // Inicia com 0 curtidas
+  },
 });
 
-const Tweet = mongoose.model('Tweet', tweetSchema);
 
-module.exports = Tweet;
+module.exports = mongoose.model('Tweet', tweetSchema);
+
+
