@@ -1,4 +1,5 @@
 const express = require('express');
+const User = require('../models/user');
 const Tweet = require('../models/tweet');
 const Like = require('../models/like');
 const authMiddleware = require('../middleware/auth');
@@ -46,5 +47,31 @@ router.post('/tweets/:tweetId/like', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'An error occurred while processing your request' });
   }
 });
+
+// Rota para listar todos os tweets que um usuário curtiu
+router.get('/users/:userId/liked-tweets', authMiddleware, async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Verificar se o usuário existe
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Buscar os likes do usuário
+    const userLikes = await Like.find({ user: userId }).populate('tweet');
+
+    // Extrair a lista de tweets dos likes
+    const tweets = userLikes.map(like => like.tweet);
+
+    res.status(200).json(tweets);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while processing your request' });
+  }
+});
+
 
 module.exports = app => app.use('/auth', router);
