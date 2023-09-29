@@ -67,4 +67,4 @@ router.post('/authenticate', async (req, res) => {
   });
 });
 
-module.exports = app => app.use('/auth', router)
+module.exports = app => app.use(router)

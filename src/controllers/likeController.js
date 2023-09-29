@@ -1,12 +1,11 @@
 const express = require('express');
-const User = require('../models/user');
 const Tweet = require('../models/tweet');
 const Like = require('../models/like');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 // Rota para curtir um tweet
-router.post('/tweets/:tweetId/like', authMiddleware, async (req, res) => {
+router.post('/like/:tweetId', authMiddleware, async (req, res) => {
   const { tweetId } = req.params;
   const userId = req.userId; // ID do usuário que está curtindo o tweet
 
@@ -48,25 +47,25 @@ router.post('/tweets/:tweetId/like', authMiddleware, async (req, res) => {
   }
 });
 
-// Rota para listar todos os tweets que um usuário curtiu
-router.get('/users/:userId/liked-tweets', authMiddleware, async (req, res) => {
-  const { userId } = req.params;
+// Rota para listar os usuários que deram like em um tweet com campos selecionados
+router.get('/like/:tweetId', authMiddleware, async (req, res) => {
+  const { tweetId } = req.params;
 
   try {
-    // Verificar se o usuário existe
-    const existingUser = await User.findById(userId);
+    // Verificar se o tweet existe
+    const existingTweet = await Tweet.findById(tweetId);
 
-    if (!existingUser) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!existingTweet) {
+      return res.status(404).json({ message: 'Tweet not found' });
     }
 
-    // Buscar os likes do usuário
-    const userLikes = await Like.find({ user: userId }).populate('tweet');
+    // Buscar os likes relacionados a este tweet
+    const likes = await Like.find({ tweet: existingTweet._id }).populate('user', 'id name surname');
 
-    // Extrair a lista de tweets dos likes
-    const tweets = userLikes.map(like => like.tweet);
+    // Extrair a lista de usuários dos likes com campos selecionados
+    const users = likes.map(like => like.user);
 
-    res.status(200).json(tweets);
+    res.status(200).json(users);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'An error occurred while processing your request' });
@@ -74,4 +73,4 @@ router.get('/users/:userId/liked-tweets', authMiddleware, async (req, res) => {
 });
 
 
-module.exports = app => app.use('/auth', router);
+module.exports = app => app.use( router);
