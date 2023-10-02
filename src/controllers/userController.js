@@ -105,6 +105,7 @@ router.delete('/users', authMiddleware, async (req, res) => {
     if (!loggedInUser) {
       return res.status(404).json({ error: 'Logged-in user not found' });
     }
+    
     await Tweet.deleteMany({ author: loggedInUserId }); // Deleta todos os tweets do usuário
 
     await Follow.deleteMany({ follower: loggedInUserId }); // Deixa de seguir todos os outros usuários

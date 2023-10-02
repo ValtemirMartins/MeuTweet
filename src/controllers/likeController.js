@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
 // Rota para curtir um tweet
-router.post('/like/:tweetId', authMiddleware, async (req, res) => {
+router.post('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
   const { tweetId } = req.params;
   const userId = req.userId; // ID do usuário que está curtindo o tweet
 
@@ -48,7 +48,7 @@ router.post('/like/:tweetId', authMiddleware, async (req, res) => {
 });
 
 // Rota para listar os usuários que deram like em um tweet com campos selecionados
-router.get('/like/:tweetId', authMiddleware, async (req, res) => {
+router.get('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
   const { tweetId } = req.params;
 
   try {
