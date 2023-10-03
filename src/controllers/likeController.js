@@ -47,7 +47,6 @@ router.post('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
   }
 });
 
-// Rota para listar os usuários que deram like em um tweet com campos selecionados
 router.get('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
   const { tweetId } = req.params;
 
@@ -62,10 +61,25 @@ router.get('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
     // Buscar os likes relacionados a este tweet
     const likes = await Like.find({ tweet: existingTweet._id }).populate('user', 'id name surname');
 
-    // Extrair a lista de usuários dos likes com campos selecionados
-    const users = likes.map(like => like.user);
+    // Contar o número de curtidas
+    const likesCount = likes.length;
 
-    res.status(200).json(users);
+    // Extrair a lista de usuários dos likes com campos selecionados
+    const likers = likes.map(like => {
+      return {
+        userId: like.user.id,
+        username: like.user.name, // Aqui você pode usar o campo de nome do usuário (ou username, se for apropriado)
+      };
+    });
+
+    // Montar o objeto de resposta
+    const responseData = {
+      tweetId: existingTweet._id,
+      likesCount,
+      likers,
+    };
+
+    res.status(200).json(responseData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'An error occurred while processing your request' });
