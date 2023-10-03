@@ -19,6 +19,7 @@ require('./controllers/authController')(app);
 require('./controllers/userController')(app);
 require('./controllers/tweetController')(app);
 require('./controllers/likeController')(app);
+require('./controllers/commentController')(app);
 
 
 module.exports = app
