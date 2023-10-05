@@ -95,7 +95,7 @@ router.get('/users', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while searching or listing users' });
   }
 });
-// Deletar o perfil do usuário logado
+// Rota para deletar o perfil do usuário logado
 router.delete('/users', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
 
@@ -105,7 +105,10 @@ router.delete('/users', authMiddleware, async (req, res) => {
     if (!loggedInUser) {
       return res.status(404).json({ error: 'Logged-in user not found' });
     }
-    
+
+    // Exclua todos os comentários feitos pelo usuário logado
+    await Comment.deleteMany({ user: loggedInUserId });
+
     await Tweet.deleteMany({ author: loggedInUserId }); // Deleta todos os tweets do usuário
 
     await Follow.deleteMany({ follower: loggedInUserId }); // Deixa de seguir todos os outros usuários
@@ -114,13 +117,13 @@ router.delete('/users', authMiddleware, async (req, res) => {
 
     await User.deleteOne({ _id: loggedInUserId });
 
-
-    res.status(200).json({ message: 'Your profile has been deleted' });
+    res.status(200).json({ message: 'Your profile has been deleted along with your comments' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while deleting the profile' });
   }
 });
+
 // Atualizar o perfil do usuário logado
 router.patch('/users', authMiddleware, async (req, res) => {
   const loggedInUserId = req.userId;
