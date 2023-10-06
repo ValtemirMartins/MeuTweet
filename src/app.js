@@ -20,6 +20,7 @@ require('./controllers/userController')(app);
 require('./controllers/tweetController')(app);
 require('./controllers/likeController')(app);
 require('./controllers/commentController')(app);
+require('./controllers/notificationContollers')(app);
 
 
 module.exports = app

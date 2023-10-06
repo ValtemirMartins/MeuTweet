@@ -106,8 +106,7 @@ router.delete('/users', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Logged-in user not found' });
     }
 
-    // Exclua todos os comentários feitos pelo usuário logado
-    await Comment.deleteMany({ user: loggedInUserId });
+    await Comment.deleteMany({ user: loggedInUserId });// Exclua todos os comentários feitos pelo usuário logado
 
     await Tweet.deleteMany({ author: loggedInUserId }); // Deleta todos os tweets do usuário
 
@@ -137,7 +136,7 @@ router.patch('/users', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Logged-in user not found' });
     }
 
-    // Verifique se o nome de usuário está sendo alterado para um que já existe (2.A)
+    // Verifique se o nome de usuário está sendo alterado para um que já existe
     if (username && username !== loggedInUser.username) {
       const existingUser = await User.findOne({ username });
 
