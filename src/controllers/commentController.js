@@ -1,8 +1,40 @@
 const express = require('express');
 const Comment = require('../models/comment');
 const User = require('../models/user'); // Importe o modelo de usuário
+const Tweet = require('../models/tweet');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
+
+
+// Rota para buscar um tweet com seus comentários ordenados por data de criação
+router.get('/tweets/:tweetId/comments', async (req, res) => {
+  try {
+    const { tweetId } = req.params;
+
+    // Buscar o tweet pelo ID
+    const tweet = await Tweet.findById(tweetId);
+
+    if (!tweet) {
+      return res.status(404).json({ error: 'Tweet not found' });
+    }
+
+    // Buscar os comentários associados a este tweet e ordená-los por data de criação
+    const comments = await Comment.find({ tweet: tweetId })
+      .populate('user', 'username')
+      .sort({ createdAt: 'asc' }); // Ordene por data de criação em ordem crescente (ou 'desc' para ordem decrescente)
+
+    // Montar a resposta
+    const responseData = {
+      tweet,
+      comments,
+    };
+
+    res.status(200).json(responseData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the tweet and its comments' });
+  }
+});
 
 // Comentar um tweet e retornar o id, name e surname do usuário que está comentando
 router.post('/tweets/:tweetId/comments', authMiddleware, async (req, res) => {
