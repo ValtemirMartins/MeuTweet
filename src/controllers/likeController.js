@@ -1,6 +1,7 @@
 const express = require('express');
 const Tweet = require('../models/tweet');
 const Like = require('../models/like');
+const Notification = require('../models/notification');
 const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 
@@ -19,23 +20,31 @@ router.post('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
 
     // Verificar se o usuário já curtiu o tweet
     const existingLike = await Like.findOne({ 
-      tweet: existingTweet._id, // Usamos o ID do tweet existente
+      tweet: existingTweet._id,
       user: userId
     });
-    console.log(tweetId, userId)
 
     if (existingLike) {
       return res.status(400).json({ message: 'You have already liked this tweet' });
     }
 
-    //Criando uma curtida com o ID do tweet existente e do usuário que está curtindo
+    // Criando uma curtida com o ID do tweet existente e do usuário que está curtindo
     const like = new Like({ 
-      tweet: existingTweet._id, // ID do tweet existente
-      user:userId
+      tweet: existingTweet._id,
+      user: userId
     });
-    console.log(tweetId, userId)
 
     await like.save();
+
+    // Adicione uma notificação para o autor do tweet
+    if (existingTweet.author.toString() !== userId) {
+      const notificationContent = `${req.use.name} liked your tweet: "${existingTweet.content}"`;
+      const newNotification = new Notification({
+        user: existingTweet.author,
+        content: notificationContent,
+      });
+      await newNotification.save();
+    }
 
     existingTweet.likeCount += 1;
     await existingTweet.save();
@@ -46,6 +55,7 @@ router.post('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'An error occurred while processing your request' });
   }
 });
+
 
 router.get('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
   const { tweetId } = req.params;
