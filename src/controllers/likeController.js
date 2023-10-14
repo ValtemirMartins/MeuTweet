@@ -39,6 +39,7 @@ router.post('/tweets/:tweetId/likes', authMiddleware, async (req, res) => {
     // Adicione uma notificação para o autor do tweet
     if (existingTweet.author.toString() !== userId) {
       const notificationContent = `${req.use.name} liked your tweet: "${existingTweet.content}"`;
+      
       const newNotification = new Notification({
         user: existingTweet.author,
         content: notificationContent,
